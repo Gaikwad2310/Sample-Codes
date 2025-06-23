@@ -1,0 +1,84 @@
+You are generating an updated version of a model performance and monitoring report using:
+- A reference PDF (last quarter’s version),
+- An Excel file with this quarter’s results located in the sheet/tab named “Summary”.
+
+**Important:**
+- Before writing any table or metric-related section, analyze the structure and formatting used in the PDF.
+- If multiple tables are present in a section (e.g., different categories of KPIs or models), reproduce the **same number of tables** with the **same structure**.
+- Replace only the values (from Excel “Summary” sheet); preserve formatting, headers, captions, footnotes, and accompanying text.
+
+---
+
+### SECTION-WISE INSTRUCTIONS
+
+**1. Introduction**
+
+**1.1 Executive Summary**  
+Write a brief but complete summary of the updated report. It must reflect the KPI results from the Excel sheet and include any changes or trends discussed later.
+
+**1.2 Model Stakeholders**  
+Copy this section **verbatim** from the uploaded PDF.
+
+**1.3 Test Source**  
+Copy from the PDF and apply this specific change:  
+[INSERT REQUIRED CHANGE HERE]
+
+---
+
+**2. Monitoring Plan**  
+Copy this section **exactly** from the PDF with no modifications.
+
+---
+
+**3. Model Testing and Performance**  
+💡 This chapter must reflect the same structure and table layout as the original PDF.
+
+**3.1 Key Performance Indicator Results**  
+- From the Excel file’s “Summary” tab, extract KPI values.  
+- Reproduce all tables from the original PDF: same number of tables, same format and column structure.  
+- Replace only the table data.
+- Below each table, write an analysis paragraph discussing the metrics, changes vs. prior quarter, and insights.
+
+**3.2 Overall Rating, Weighting Methodology, and Rationale**  
+- Retain the structure from the original document.  
+- Update the overall rating using this quarter’s KPI values from Excel.  
+- Describe the methodology and rationale clearly.
+
+**3.3 KPI History**  
+- Build a KPI history table showing the current quarter (from Excel “Summary” tab) and previous 3 quarters (from the uploaded PDF).  
+- Follow the exact structure (multiple tables if used previously).  
+- Include a written analysis of performance over time, noting improvements, regressions, and patterns.
+
+---
+
+**4. Attestations**
+
+**4.1 Regression Testing**  
+Copy from the PDF. Update date/test cycle references.
+
+**4.2 Monitoring Plan is Up-to-Date**  
+Copy from the PDF. Update dates if needed.
+
+---
+
+**5. Conclusion**  
+Write a complete conclusion based on the full report. Discuss:
+- Model status based on KPI data
+- Any performance changes
+- Final evaluation and outlook
+
+Maintain a formal, technical tone in line with the rest of the report.
+
+---
+
+**References**  
+Copy this section **exactly** from the PDF. No changes required.
+
+---
+
+**GENERAL RULES**  
+- Use **only** the "Summary" tab in the Excel file for updated data  
+- Follow **all formatting conventions** from the PDF: same section order, table formats, font/structure, figure/table captions  
+- Do **not summarize, compress, or skip** any section  
+- Make sure the final output looks like a **natural continuation of the PDF’s format**, just with new values
+
