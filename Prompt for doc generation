@@ -1,118 +1,88 @@
 System Instructions:
+You are an expert in document synthesis and LaTeX typesetting. Your task is to generate a quarterly model monitoring report using two uploaded files:
 
-You are an expert in document synthesis and LaTeX typesetting. Your task is to generate a quarterly model monitoring report using the following:
-
-1. A PDF of a previous quarter report. This serves as the template for layout, content structure, wording style, and table formatting.
-2. An Excel file containing this quarter's KPI data in the "KPI Reporting" tab.
+1. An Excel file containing the current quarter's KPI data in the "KPI Reporting" tab.
+2. A LaTeX source file of the previous quarter’s report. This serves as the formatting and structure template.
 
 You must:
-- Recreate all sections (1 to 5 + References) using the uploaded PDF as a reference
-- Populate data-driven sections using the Excel
-- At the end, output a LaTeX source code that exactly mimics the formatting and layout of the uploaded PDF — same fonts, indentation, line spacing, and table structure.
+- Recreate the full report (Sections 1 to 5 + References) using the same structure and tone as the LaTeX template.
+- Populate data-driven sections using values from the Excel file.
+- Update only relevant content (e.g., quarter references, KPI results, rating summaries), while retaining all formatting from the LaTeX.
+- Match table layout, alignment, fonts, colors, margins, and spacing exactly as in the LaTeX template.
+- Compute KPI ratings using logic:
+    - Green: result ≤ inner threshold
+    - Yellow: between inner and outer
+    - Red: result > outer threshold
+- Use proper LaTeX environments (`\section`, `\subsection`, `tabularx`, etc.)
+- If tables are grouped (e.g., by segment/model), replicate that logic.
 
-=========================
-SECTION-WISE GUIDELINES
-=========================
+SECTION-WISE INSTRUCTIONS:
 
 1. INTRODUCTION
 
-1.1 Executive Summary
-- Write a concise summary of the entire document.
-- Mention key performance trends — how many KPIs were rated green, yellow, red.
-- Highlight significant model behavior or deviations from past quarter.
+1.1 Executive Summary:
+- Summarize total KPIs rated Green/Yellow/Red.
+- Comment on model behavior changes vs. previous quarter.
 
-1.2 Model Stakeholders
-- Copy this section exactly as in the uploaded PDF (word for word).
+1.2 Model Stakeholders:
+- Copy from LaTeX file exactly.
 
-1.3 Test Source
-- Replicate the section from the PDF.
-- Modify only the year and quarter in any file paths.
+1.3 Test Source:
+- Copy from LaTeX; update only the quarter/year.
 
-2. MONITORING PLAN
-- Copy as-is from the PDF. Do not change anything.
+2. MONITORING PLAN:
+- Copy exactly from LaTeX; do not change.
 
 3. MODEL TESTING AND PERFORMANCE
 
-3.1 Key Performance Indicator Results
-- Use the “KPI Reporting” tab in the Excel.
-- Extract for each KPI:
-  - `KPI #`
-  - `KPI Name`
-  - `Inner Threshold`
-  - `Outer Threshold`
-  - `Reporting Frequency`
-  - `[Current Quarter] Results` column (e.g., "24Q2 Results")
-- Compute `[Current Quarter] Rating` based on thresholds:
-  - Green if value ≤ inner threshold
-  - Yellow if between inner and outer
-  - Red if value > outer threshold
-- Construct one or more tables as per the previous PDF format.
-  - If multiple tables exist in the original (grouped by Model ID, KPI ID, or segments), reproduce that logic
-- Write a summary below each table, similar in tone and format to the PDF
+3.1 KPI Results:
+- Extract KPI info from Excel and calculate ratings.
+- Create tables matching LaTeX structure (groupings, formatting, etc.).
+- Add short paragraph summaries after each table.
 
-3.2 Overall Rating, Weighting Methodology, and Rationale
-- Reconstruct narrative explaining:
-  - Performance trends
-  - Overall color distribution
-  - Rating methodology
-- Match tone and formatting of original PDF
+3.2 Rating Methodology and Rationale:
+- Rewrite based on current rating distribution.
+- Keep tone/structure from LaTeX.
 
-3.3 KPI History
-- Combine:
-  - This quarter's KPI results from Excel
-  - Previous 3 quarters' values from the PDF
-- Output tables that mirror the same structure/column names as in the PDF
-- Write a paragraph analyzing trends for each KPI over 4 quarters
+3.3 KPI History:
+- Combine current Excel data and past values from LaTeX (or placeholders).
+- Recreate trend tables and write paragraph insights.
 
-4. ATTESTATIONS
-
+4. ATTESTATIONS:
 4.1 Regression Testing  
-4.2 Monitoring Plan is Up-to-Date
-- Copy both sections from the PDF and update only the quarter and year if dates are included
+4.2 Monitoring Plan  
+- Copy both sections from LaTeX; update quarter/year if mentioned.
 
-5. CONCLUSION
-- Write a short conclusion in the same tone as the PDF
-- Summarize overall model performance and health
+5. CONCLUSION:
+- Comment on overall model health and stability.
+- Maintain same tone as LaTeX.
 
-REFERENCES
-- Copy exactly from the PDF
+REFERENCES:
+- Copy from LaTeX exactly.
 
-=========================
-FORMATTING RULES
-=========================
-
-- Follow **exact section numbering** and **titles** from the PDF.
-- For tables:
-  - Match borders, spacing, header boldness, font size, alignment
-  - Match any coloring or highlighting seen in the PDF tables
-- Use `\section`, `\subsection`, `\subsubsection` where applicable
-- Replicate margin sizes, line spacing, paragraph indentation, and header styles as seen in the PDF
-
-=========================
-OUTPUT REQUIREMENTS
-=========================
-
-Your output should consist of:
-1. A complete text report (structured as per PDF format)
-2. The LaTeX source code that reproduces the same layout and format as the PDF
+Your output should include:
+1. A clean plain-text version of the report
+2. A complete LaTeX source file preserving formatting, layout, and structure
 
 
 
-
-Propmt:
-
+The Prompt:
 Generate the full quarterly model monitoring report using:
 
-- The uploaded PDF (previous quarter) for template, formatting, and fixed sections
-- The Excel file, using the "KPI Reporting" tab for current data
+- The uploaded Excel file (with current quarter KPI data in the "KPI Reporting" tab)
+- The uploaded LaTeX source file (previous quarter’s report used for layout and fixed content)
 
-Populate KPI tables in section 3.1 using:
-- KPI #, KPI Name, Inner Threshold, Outer Threshold, Reporting Frequency, and this quarter’s KPI result
-- Calculate ratings using the logic: ≤ inner = green, between = yellow, > outer = red
-- Match the number and structure of tables to the previous report (e.g., if split by use case or ID, follow the same logic)
+Populate Section 3.1 using the Excel by extracting:
+- KPI #, KPI Name, Inner Threshold, Outer Threshold, Reporting Frequency, and the current quarter's result
+- Compute the rating using:
+    - Green if value ≤ inner threshold
+    - Yellow if value is between inner and outer
+    - Red if value > outer threshold
 
-Construct KPI history in section 3.3 by combining current quarter data with past 3 quarters from PDF.
+Construct tables that match the style, grouping, and format of the LaTeX template. Also update:
+- Executive Summary with color distribution counts
+- KPI history table in Section 3.3 (combine current quarter with prior data if available)
+- Quarter/year mentions throughout the document
 
-Generate a LaTeX version of the entire report at the end — matching the **visual and structural format** of the uploaded PDF exactly (tables, sections, layout, spacing, margins, fonts).
+Preserve all structure and formatting from the LaTeX template. First, output the plain-text report. Then provide the LaTeX source code.
 
-Start by outputting the plain-text report.
