@@ -1,1 +1,13 @@
+@workspace I need to replicate a SAS PD (probability of default) model in Python exactly. Search the whole workspace and extract everything related to the optimization. Quote the exact SAS code lines with file name and line number, don't paraphrase. If something isn't found, say "NOT FOUND" instead of guessing.
 
+1. Where is "optmz" defined and used? Show every %let, %macro parameter, or assignment, and what it resolves to at runtime.
+2. The actual optimizer call: show the full statement (e.g. call nlpqn(...), proc nlp, proc nlmixed, proc iml block) including every argument.
+3. Any opt, tc, par, blc (bounds/constraints) or similar vectors passed to that call. Show their full definitions and values.
+4. The objective function module: the full start...finish module (or equivalent) that computes the likelihood. Say whether it's minimized or maximized and whether it returns log-likelihood or negative log-likelihood.
+5. Any gradient or Hessian module passed in ("grd", "hes" etc.), or confirm SAS uses finite differences.
+6. Initial parameter values (x0 or equivalent) and how they're built.
+7. The input dataset(s): which variables go in as the default flag and as predictors, any transformations before the fit (WOE, binning, capping, standardization, dummies), weights, and any row filters.
+8. What's done after optimization: how standard errors / covariance / p-values are computed, and how PDs are scored.
+9. Any other macro variables or %include files the above depends on, resolved to their values.
+
+Output as a numbered list matching the points above, code blocks for SAS code.
