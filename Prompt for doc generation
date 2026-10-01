@@ -1,53 +1,22 @@
-You are replicating a SAS PD (probability of default) model in Python. The goal is output that matches SAS exactly: parameter estimates, standard errors, Wald chi-square, p-values, log-likelihood and scored PDs. Estimates already match closely in earlier attempts; the known problem area is the standard errors, Wald stats and p-values, so treat those as the top priority.
+The Python replication of the SAS NLPQN DBFGS PD model matches SAS estimates closely, but the Wald chi-square (and so p-values) mismatch. Attached/pasted: the mismatch rows (SAS vs Python estimate, SE, Wald, p-value), the SAS covariance matrix, and the SAS code that computes covariance, SE and Wald. Fix the Python so the Wald stats match SAS. Do not modify sample_bfgs.py and do not replace the DBFGS optimizer. Do not touch optimizer.py unless Step 1 proves the estimates are the cause.
 
-Inputs:
-- The SAS extraction from earlier in this chat (optimizer call, opt/tc vectors, objective module, data prep, post-estimation code). This is the source of truth.
-- #file:sample_bfgs.py : existing Python code that uses BFGS. Use it ONLY for input/output conventions: input folder, output folder, file names, file formats, config/argument handling. Do NOT modify this file and do not reuse its optimizer.
-Requirements:
+Step 1: Attribute the Wald error before changing anything.
+For every parameter, compute in Python:
+- W_sas_check = (SAS estimate / SAS SE)^2 → if this doesn't reproduce SAS's printed Wald, the FORMULA is different (go to Step 3).
+- W_a = (Python estimate / SAS SE)^2 → isolates the effect of the estimate difference.
+- W_b = (SAS estimate / Python SE)^2 → isolates the effect of the SE difference.
+Report a table per parameter showing which of estimate, SE or formula explains the mismatch. Note that relative Wald error ≈ 2 × (relative estimate error + relative SE error), so coefficients close to zero or with small Wald values show large RELATIVE differences from tiny absolute ones. Flag those separately and judge them on absolute difference, not relative.
 
-1. Create NEW code. Do not edit any existing file.
+Step 2: If the SE is the cause (most likely), match the SAS covariance exactly.
+- Read the SAS code and state exactly how the covariance is built: analytic Hessian, finite-difference Hessian (e.g. NLPFDD: from function values or from gradients, forward or central differences, step size formula), the quasi-Newton approximation, or a custom formula. Include any scaling (n/(n-p), weights, sigma squared) and whether it inverts the Hessian of the log-likelihood or of the negative log-likelihood.
+- Replicate that exact method, not the textbook one. If SAS uses finite differences, Python must use the same finite-difference scheme and step sizes, NOT the analytic Hessian, even though analytic is "more accurate".
+- Compare the Python covariance matrix element by element with the SAS one. If it still differs, test each candidate (analytic, forward FD, central FD, FD of gradient vs FD of function, quasi-Newton approx, with/without n/(n-p)) and report which reproduces SAS. Mark the chosen step-size formula as an ASSUMPTION if it isn't explicit in the SAS code.
+- Make sure the covariance is computed at the FINAL estimates, with float64 throughout.
 
-2. Structure it as separate modules, for example:
-   - optimizer.py : DBFGS optimizer (Cholesky-factor Hessian update, SAS default GCONV=1e-8, ABSGCONV=1e-5, MAXITER=200, MAXFUNC=500, overridden by whatever the SAS opt/tc vectors set)
-   - model.py : objective function and gradient, written to mirror the SAS objective module line by line (same sign convention, same handling of weights, same transformations)
-   - stats.py : covariance, SE, Wald chi-square, p-values, any other statistics SAS outputs
-   - io_utils.py : reading input and writing output, following sample_bfgs.py conventions
-   - run.py : entry point
-   - compare.py : compares Python output against the SAS output files
-   If any package not already used in sample_bfgs.py is needed, list it in a separate requirements.txt. Do not change my existing environment or install anything globally. Prefer numpy, scipy, pandas only.
+Step 3: If the formula is the cause, match it.
+- Check: squared vs unsquared statistic, chi-square vs normal vs t distribution, degrees of freedom, and any joint/multi-df Wald tests (W = b' V^-1 b with df = number of params in the group, e.g. for dummy groups).
+- Check for rounding of estimates or SEs before the Wald is computed, and for SAS display rounding (e.g. 4 decimals, p-value shown as "<.0001") that makes values look mismatched when they aren't. compare.py should compare against SAS at SAS's printed precision as well as at full precision.
 
-3. The optimizer must be the SAS NLPQN dual BFGS (DBFGS) method, implemented from scratch in optimizer.py exactly as specified below. Do not substitute scipy.optimize.minimize, statsmodels, sklearn or any other fitting routine for the estimation.
+Step 4: If (and only if) Step 1 shows the estimate is the cause, align convergence: use the same stopping criterion SAS reports as satisfied (GCONV 1e-8, ABSGCONV 1e-5, or whatever the SAS opt/tc vectors set), and confirm the final gradient magnitude is comparable to SAS's.
 
-   DBFGS spec:
-   - Keep the Hessian approximation B (NOT the inverse Hessian) as a lower-triangular Cholesky factor L, with B = L @ L.T. Never form an explicit inverse.
-   - Initial L = sqrt(c) * I where c = max(max(abs(g0)), 1.0), unless the SAS code sets an initial Hessian, in which case use its Cholesky factor.
-   - Each iteration:
-     a. z = solve_triangular(L, g, lower=True)
-     b. Stop if max(abs(g)) <= ABSGCONV, or if (z @ z) / max(abs(f), 1e-6) <= GCONV. Also stop at MAXITER / MAXFUNC.
-     c. Direction d = -solve_triangular(L.T, z, lower=False)
-     d. Step size a from scipy.optimize.line_search (strong Wolfe). If it returns None, fall back to Armijo backtracking: start a=1, halve until f(x + a*d) <= f + 1e-4 * a * (g @ d).
-     e. s = a*d, x_new = x + s, y = g_new - g
-     f. If (y @ s) > 1e-10 * norm(s) * norm(y), update L:
-        v = L.T @ s
-        w = v / norm(v)
-        J = L + outer(y / sqrt(y @ s) - L @ w, w)
-        R = scipy.linalg.qr(J.T, mode="r")[0]
-        L = R.T, then multiply each column of L by the sign of its diagonal element so the diagonal is positive.
-        Otherwise skip the update and keep L.
-   - Return final x, f, gradient, iteration count, function-call count and L.
-   - Log per iteration: iteration number, f, max abs gradient, step size, and whether the update was skipped, so it can be compared against the SAS iteration history.
-   - Add a small test: on synthetic logistic regression data, DBFGS estimates must match a plain Newton-Raphson fit to within 1e-6. Newton is only for this test, never for the real model.
-
-4. For the standard errors and tests, replicate EXACTLY what the SAS code does. Before writing stats.py, state explicitly from the SAS code:
-   - Which matrix the covariance comes from: exact analytic Hessian, finite-difference Hessian (e.g. NLPFDD), the quasi-Newton approximation, or something else
-   - If finite differences: forward or central, and the step size formula SAS uses
-   - Any scaling (VARDEF, n vs n-p, sigma squared, weights)
-   - The Wald formula and distribution used for p-values (chi-square df=1, normal, t with which df)
-   - Any rounding or truncation applied before the stats are computed
-   If the SAS extraction doesn't specify something, flag it as an ASSUMPTION in a comment block at the top of stats.py instead of guessing silently.
-
-5. Use float64 throughout. Keep the parameter order and names identical to SAS. Match SAS output column names and layout so the outputs can be diffed directly.
-
-6. compare.py should load the SAS output and the Python output and report, per parameter: absolute and relative difference for estimate, SE, Wald chi-square and p-value, plus log-likelihood and PD differences. Flag anything with relative difference above 1e-6.
-
-7. After writing the code, run it, run compare.py, and if there are mismatches in SE/Wald/p-values, diagnose the cause against the SAS code and fix it. Report what you changed and why.
+Step 5: Rerun compare.py and report a before/after table per parameter: estimate, SE, Wald, p-value, absolute and relative differences, plus the Step 1 attribution. List any assumption still unverified.
